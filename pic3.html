@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>World Cup 2026 — US Host Cities</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #fff; font-family: system-ui, sans-serif; }
+figure { width: 100%; }
+figure::before { content: ''; display: block; height: 4px; background: linear-gradient(90deg, #24324A, #B6842D); }
+.img-wrap { width: 100%; height: 360px; overflow: hidden; background: #e8e4dc; position: relative; }
+.img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.fallback { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+.fallback-icon { font-size: 48px; opacity: 0.3; }
+.fallback-text { font-size: 13px; color: #999; }
+figcaption { background: #24324A; color: #c0b8a8; font-size: 13px; padding: 11px 18px; line-height: 1.55; }
+figcaption b { color: #B6842D; font-weight: 700; }
+</style>
+</head>
+<body>
+<figure>
+  <div class="img-wrap">
+    <div class="fallback" id="fb">
+      <div class="fallback-icon">⚽</div>
+      <div class="fallback-text">Loading image…</div>
+    </div>
+    <img
+      src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1200&q=80"
+      alt="Football fans gathered outside a major US stadium on World Cup matchday"
+      onload="document.getElementById('fb').style.display='none'"
+      onerror="document.getElementById('fb').innerHTML='<div class=fallback-icon>⚽</div><div class=fallback-text>Stadium image — visible on live site</div>'"
+      loading="lazy">
+  </div>
+  <figcaption>The 2026 World Cup spans 11 US host cities — Pacific timezone venues log 31.5 more working-day match hours than Eastern venues. <b>Vegas Insider</b> · 2026 World Cup Workplace Disruption Study</figcaption>
+</figure>
+</body>
+</html>
