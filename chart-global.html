@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Global Rankings — World Cup 2026 — Vegas Insider</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:28px 28px 24px;color:#1a1a1a;}
+.brand{font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#B6842D;margin-bottom:6px;}
+.title{font-size:19px;font-weight:700;color:#1a1a1a;line-height:1.3;margin-bottom:6px;}
+.sub{font-size:14px;color:#444;margin-bottom:24px;line-height:1.5;}
+.pag{display:flex;align-items:center;justify-content:space-between;margin-top:20px;padding-top:16px;border-top:1px solid #e8e8e8;}
+.pag button{font-size:13px;font-weight:600;padding:7px 16px;border:1.5px solid #999;background:#fff;color:#222;border-radius:4px;cursor:pointer;}
+.pag button:hover:not([disabled]){border-color:#24324A;color:#24324A;}
+.pag button[disabled]{opacity:0.3;cursor:default;}
+.pag-info{font-size:13px;color:#444;font-weight:600;}
+.foot{font-size:12px;color:#666;margin-top:16px;display:flex;justify-content:space-between;align-items:baseline;gap:16px;}
+.foot-brand{font-weight:700;color:#B6842D;white-space:nowrap;flex-shrink:0;font-size:13px;}
+</style>
+</head>
+<body>
+<div class="brand">Vegas Insider · World Cup 2026</div>
+<div class="title">Hours of World Cup football inside the working day</div>
+<div class="sub">9am–5pm Monday–Friday across all 104 fixtures · top 30 cities globally</div>
+<div style="position:relative;width:100%;" id="area"></div>
+<div class="pag">
+  <button id="prev" disabled onclick="turn(-1)">← Prev</button>
+  <span class="pag-info" id="info"></span>
+  <button id="next" onclick="turn(1)">Next →</button>
+</div>
+<div class="foot">
+  <span>FIFA 2026 schedule · FIFA World Rankings · Nielsen 2022 World Cup TV Audience Report · Vegas Insider, May 2026</span>
+  <span class="foot-brand">VEGAS INSIDER</span>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const ALL=[
+  {r:1,  city:"Honolulu",       ctry:"USA",         f:"🇺🇸", h:109.5},
+  {r:2,  city:"Anchorage",      ctry:"USA",         f:"🇺🇸", h:95.5},
+  {r:3,  city:"Bogotá",         ctry:"Colombia",    f:"🇨🇴", h:77.0},
+  {r:4,  city:"Mexico City",    ctry:"Mexico",      f:"🇲🇽", h:77.0},
+  {r:4,  city:"Guadalajara",    ctry:"Mexico",      f:"🇲🇽", h:77.0},
+  {r:4,  city:"Monterrey",      ctry:"Mexico",      f:"🇲🇽", h:77.0},
+  {r:7,  city:"Buenos Aires",   ctry:"Argentina",   f:"🇦🇷", h:57.5},
+  {r:7,  city:"Córdoba",        ctry:"Argentina",   f:"🇦🇷", h:57.5},
+  {r:9,  city:"São Paulo",      ctry:"Brazil",      f:"🇧🇷", h:57.5},
+  {r:9,  city:"Rio de Janeiro", ctry:"Brazil",      f:"🇧🇷", h:57.5},
+  {r:9,  city:"Brasília",       ctry:"Brazil",      f:"🇧🇷", h:57.5},
+  {r:12, city:"Los Angeles",    ctry:"USA",         f:"🇺🇸", h:89.0},
+  {r:12, city:"San Francisco",  ctry:"USA",         f:"🇺🇸", h:89.0},
+  {r:12, city:"Seattle",        ctry:"USA",         f:"🇺🇸", h:89.0},
+  {r:15, city:"Vancouver",      ctry:"Canada",      f:"🇨🇦", h:89.0},
+  {r:16, city:"Tokyo",          ctry:"Japan",       f:"🇯🇵", h:48.0},
+  {r:17, city:"Quito",          ctry:"Ecuador",     f:"🇪🇨", h:67.5},
+  {r:18, city:"Dallas",         ctry:"USA",         f:"🇺🇸", h:67.5},
+  {r:18, city:"Kansas City",    ctry:"USA",         f:"🇺🇸", h:67.5},
+  {r:18, city:"Houston",        ctry:"USA",         f:"🇺🇸", h:67.5},
+  {r:21, city:"Seoul",          ctry:"South Korea", f:"🇰🇷", h:48.0},
+  {r:22, city:"Montevideo",     ctry:"Uruguay",     f:"🇺🇾", h:57.5},
+  {r:23, city:"Lima",           ctry:"Peru",        f:"🇵🇪", h:77.0},
+  {r:24, city:"Sydney",         ctry:"Australia",   f:"🇦🇺", h:60.0},
+  {r:24, city:"Melbourne",      ctry:"Australia",   f:"🇦🇺", h:60.0},
+  {r:24, city:"Brisbane",       ctry:"Australia",   f:"🇦🇺", h:60.0},
+  {r:27, city:"New York",       ctry:"USA",         f:"🇺🇸", h:57.5},
+  {r:27, city:"Boston",         ctry:"USA",         f:"🇺🇸", h:57.5},
+  {r:27, city:"Miami",          ctry:"USA",         f:"🇺🇸", h:57.5},
+  {r:27, city:"Atlanta",        ctry:"USA",         f:"🇺🇸", h:57.5},
+];
+const PER=10; let page=0, ch=null;
+
+const inlineLabels={
+  id:'inlineLabels',
+  afterDraw(chart){
+    const ctx=chart.ctx;
+    ctx.save();
+    ctx.font='bold 12px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
+    ctx.fillStyle='#fff';
+    ctx.textAlign='right';
+    ctx.textBaseline='middle';
+    chart.data.datasets[0].data.forEach((val,i)=>{
+      const bar=chart.getDatasetMeta(0).data[i];
+      if(!bar) return;
+      const bw=bar.x-chart.scales.x.getPixelForValue(0);
+      if(bw>44) ctx.fillText(val+'h', bar.x-9, bar.y);
+    });
+    ctx.restore();
+  }
+};
+
+function render(){
+  const total=Math.ceil(ALL.length/PER);
+  document.getElementById('prev').disabled=page===0;
+  document.getElementById('next').disabled=(page+1)>=total;
+  document.getElementById('info').textContent='Page '+(page+1)+' of '+total;
+  const slice=ALL.slice(page*PER,(page+1)*PER);
+  const area=document.getElementById('area');
+  area.innerHTML='';
+  const wrap=document.createElement('div');
+  wrap.style.cssText='position:relative;width:100%;height:'+(slice.length*52+40)+'px';
+  const cv=document.createElement('canvas');
+  cv.setAttribute('role','img');
+  cv.setAttribute('aria-label','Horizontal bar chart: working-day match hours by city');
+  wrap.appendChild(cv); area.appendChild(wrap);
+  if(ch){ch.destroy();ch=null;}
+  ch=new Chart(cv,{
+    type:'bar',
+    data:{
+      labels:slice.map(d=>d.f+' '+d.city+', '+d.ctry+'  #'+d.r),
+      datasets:[{
+        data:slice.map(d=>d.h),
+        backgroundColor:slice.map((d,i)=>i===0&&page===0?'#B6842D':'#24324A'),
+        borderRadius:3,borderSkipped:false,
+      }]
+    },
+    options:{
+      indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.parsed.x+' hours working-day'}}},
+      scales:{
+        x:{max:120,grid:{color:'rgba(0,0,0,0.06)'},border:{display:false},ticks:{font:{size:12},color:'#555',callback:v=>v+'h'}},
+        y:{grid:{display:false},border:{display:false},ticks:{font:{size:13,weight:'600'},color:'#111'}}
+      },
+      animation:{duration:500,onComplete:function(){inlineLabels.afterDraw(ch);}}
+    },
+    plugins:[inlineLabels]
+  });
+}
+function turn(d){page+=d;render();}
+render();
+</script>
+</body>
+</html>
