@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>European Cities — World Cup 2026 — Vegas Insider</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:28px 28px 24px;}
+.brand{font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#B6842D;margin-bottom:6px;}
+.title{font-size:19px;font-weight:700;color:#1a1a1a;line-height:1.3;margin-bottom:6px;}
+.sub{font-size:14px;color:#444;margin-bottom:16px;line-height:1.5;}
+.legend{display:flex;gap:22px;margin-bottom:20px;flex-wrap:wrap;}
+.li{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#222;}
+.ld{width:14px;height:14px;border-radius:2px;flex-shrink:0;}
+.foot{font-size:12px;color:#666;margin-top:18px;display:flex;justify-content:space-between;align-items:baseline;gap:16px;}
+.foot-brand{font-weight:700;color:#B6842D;white-space:nowrap;font-size:13px;}
+</style>
+</head>
+<body>
+<div class="brand">Vegas Insider · World Cup 2026 · Europe</div>
+<div class="title">European cities: working-day hours vs football interest rating</div>
+<div class="sub">The world's most passionate football cities log near-zero working-day disruption.</div>
+<div class="legend">
+  <div class="li"><div class="ld" style="background:#24324A"></div>Working-day match hours</div>
+  <div class="li"><div class="ld" style="background:#B6842D"></div>Football interest rating (out of 100)</div>
+</div>
+<div style="position:relative;width:100%;height:660px">
+  <canvas id="c" role="img" aria-label="European cities: working-day hours vs football interest rating"></canvas>
+</div>
+<div class="foot">
+  <span>FIFA 2026 schedule · FIFA World Rankings · Nielsen 2022 World Cup TV Audience Report · Vegas Insider, May 2026</span>
+  <span class="foot-brand">VEGAS INSIDER</span>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const D=[
+  {l:"🇫🇷 Paris",       h:0.0,  i:100.0},
+  {l:"🇪🇸 Madrid",      h:0.0,  i:94.2},
+  {l:"🇪🇸 Barcelona",   h:0.0,  i:94.2},
+  {l:"🏴󠁧󠁢󠁥󠁮󠁧󠁿 London",      h:0.0,  i:91.5},
+  {l:"🏴󠁧󠁢󠁥󠁮󠁧󠁿 Manchester",  h:0.0,  i:91.5},
+  {l:"🇮🇹 Rome",        h:0.0,  i:90.3},
+  {l:"🇩🇪 Berlin",      h:0.0,  i:87.6},
+  {l:"🇵🇱 Warsaw",      h:0.0,  i:76.7},
+  {l:"🇵🇹 Lisbon",      h:4.0,  i:73.0},
+  {l:"🇮🇪 Dublin",      h:2.0,  i:46.0},
+];
+const plugin={id:'il',afterDraw(chart){
+  const ctx=chart.ctx, xs=chart.scales.x; ctx.save();
+  ctx.font='bold 11px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
+  ctx.fillStyle='#fff'; ctx.textAlign='right'; ctx.textBaseline='middle';
+  // Interest bars (dataset 1) — always wide enough for label
+  chart.data.datasets[1].data.forEach((v,i)=>{
+    const bar=chart.getDatasetMeta(1).data[i]; if(!bar) return;
+    if(bar.x-xs.getPixelForValue(0)>40) ctx.fillText(v, bar.x-8, bar.y);
+  });
+  // Hours bars (dataset 0) — only when bar has real width
+  D.forEach((d,i)=>{
+    if(d.h===0) return;
+    const bar=chart.getDatasetMeta(0).data[i]; if(!bar) return;
+    if(bar.x-xs.getPixelForValue(0)>36) ctx.fillText(d.h+'h', bar.x-8, bar.y);
+  });
+  ctx.restore();
+}};
+new Chart(document.getElementById('c'),{
+  type:'bar',
+  data:{
+    labels:D.map(d=>d.l),
+    datasets:[
+      {label:'Working-day hours', data:D.map(d=>Math.max(d.h,0.15)), backgroundColor:'#24324A', borderRadius:3, borderSkipped:false},
+      {label:'Football interest',  data:D.map(d=>d.i),                backgroundColor:'#B6842D', borderRadius:3, borderSkipped:false},
+    ]
+  },
+  options:{
+    indexAxis:'y',responsive:true,maintainAspectRatio:false,
+    plugins:{
+      legend:{display:false},
+      tooltip:{callbacks:{label:c=>{
+        if(c.datasetIndex===0){const v=D[c.dataIndex].h; return ' '+v+'h working-day';}
+        return ' '+c.parsed.x+' / 100 football interest';
+      }}}
+    },
+    scales:{
+      x:{max:105,grid:{color:'rgba(0,0,0,0.06)'},border:{display:false},ticks:{font:{size:12},color:'#555'}},
+      y:{grid:{display:false},border:{display:false},ticks:{font:{size:13,weight:'600'},color:'#111'}}
+    },
+    animation:{duration:500}
+  },
+  plugins:[plugin]
+});
+</script>
+</body>
+</html>
