@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>US Host Cities — World Cup 2026 — Vegas Insider</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:28px 28px 24px;}
+.brand{font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#B6842D;margin-bottom:6px;}
+.title{font-size:19px;font-weight:700;color:#1a1a1a;line-height:1.3;margin-bottom:6px;}
+.sub{font-size:14px;color:#444;margin-bottom:24px;line-height:1.5;}
+.foot{font-size:12px;color:#666;margin-top:18px;display:flex;justify-content:space-between;align-items:baseline;gap:16px;}
+.foot-brand{font-weight:700;color:#B6842D;white-space:nowrap;font-size:13px;}
+</style>
+</head>
+<body>
+<div class="brand">Vegas Insider · World Cup 2026 · United States</div>
+<div class="title">US host cities: hours of World Cup football inside the working day</div>
+<div class="sub">All 11 official venues. Pacific cities log 89h — 31.5 more than Eastern cities.</div>
+<div style="position:relative;width:100%;height:620px">
+  <canvas id="c" role="img" aria-label="US host city working-day hours"></canvas>
+</div>
+<div class="foot">
+  <span>FIFA 2026 schedule · FIFA World Rankings · Nielsen 2022 World Cup TV Audience Report · Vegas Insider, May 2026</span>
+  <span class="foot-brand">VEGAS INSIDER</span>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const D=[
+  {l:"🇺🇸 Los Angeles, CA  #1  Pacific",   h:89.0, c:"#24324A"},
+  {l:"🇺🇸 San Francisco, CA  #2  Pacific",  h:89.0, c:"#24324A"},
+  {l:"🇺🇸 Seattle, WA  #3  Pacific",        h:89.0, c:"#24324A"},
+  {l:"🇺🇸 Dallas, TX  #4  Central",         h:67.5, c:"#4a6080"},
+  {l:"🇺🇸 Kansas City, MO  #5  Central",    h:67.5, c:"#4a6080"},
+  {l:"🇺🇸 Houston, TX  #6  Central",        h:67.5, c:"#4a6080"},
+  {l:"🇺🇸 New York, NY  #7  Eastern",       h:57.5, c:"#7a90a8"},
+  {l:"🇺🇸 Boston, MA  #8  Eastern",         h:57.5, c:"#7a90a8"},
+  {l:"🇺🇸 Miami, FL  #9  Eastern",          h:57.5, c:"#7a90a8"},
+  {l:"🇺🇸 Atlanta, GA  #10  Eastern",       h:57.5, c:"#7a90a8"},
+  {l:"🇺🇸 Philadelphia, PA  #11  Eastern",  h:57.5, c:"#7a90a8"},
+];
+let ch=null;
+const plugin={id:'il',afterDraw(chart){
+  const ctx=chart.ctx; ctx.save();
+  ctx.font='bold 12px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
+  ctx.fillStyle='#fff'; ctx.textAlign='right'; ctx.textBaseline='middle';
+  chart.data.datasets[0].data.forEach((v,i)=>{
+    const bar=chart.getDatasetMeta(0).data[i]; if(!bar) return;
+    if(bar.x-chart.scales.x.getPixelForValue(0)>44) ctx.fillText(v+'h',bar.x-9,bar.y);
+  });
+  ctx.restore();
+}};
+ch=new Chart(document.getElementById('c'),{
+  type:'bar',
+  data:{labels:D.map(d=>d.l),datasets:[{data:D.map(d=>d.h),backgroundColor:D.map(d=>d.c),borderRadius:3,borderSkipped:false}]},
+  options:{
+    indexAxis:'y',responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.parsed.x+'h working-day'}}},
+    scales:{
+      x:{max:95,grid:{color:'rgba(0,0,0,0.06)'},border:{display:false},ticks:{font:{size:12},color:'#555',callback:v=>v+'h'}},
+      y:{grid:{display:false},border:{display:false},ticks:{font:{size:13,weight:'600'},color:'#111'}}
+    },
+    animation:{duration:500}
+  },
+  plugins:[plugin]
+});
+</script>
+</body>
+</html>
