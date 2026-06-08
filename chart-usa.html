@@ -3,94 +3,213 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>US Host Cities — World Cup 2026 — Vegas Insider</title>
+<title>US Cities — World Cup 2026 — Vegas Insider</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:28px 28px 24px;}
 .brand{font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#B6842D;margin-bottom:6px;}
 .title{font-size:19px;font-weight:700;color:#1a1a1a;line-height:1.3;margin-bottom:6px;}
 .sub{font-size:14px;color:#444;margin-bottom:16px;line-height:1.5;}
-.tabs{display:flex;gap:0;margin-bottom:20px;border-bottom:2px solid #e4dfd4;}
-.tab{font-size:13px;font-weight:600;padding:8px 18px;cursor:pointer;color:#666;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.15s;}
+.tabs{display:flex;gap:0;margin-bottom:12px;border-bottom:2px solid #e4dfd4;flex-wrap:wrap;}
+.tab{font-size:13px;font-weight:600;padding:8px 18px;cursor:pointer;color:#666;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.15s;white-space:nowrap;}
 .tab.active{color:#24324A;border-bottom-color:#B6842D;}
 .tab:hover:not(.active){color:#24324A;}
+.filter-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.filter-btn{font-size:12px;font-weight:600;padding:5px 12px;border:1.5px solid #ccc;border-radius:20px;cursor:pointer;color:#555;background:#fff;transition:all 0.15s;}
+.filter-btn.active{background:#24324A;color:#fff;border-color:#24324A;}
+.filter-btn:hover:not(.active){border-color:#24324A;color:#24324A;}
 .note{font-size:11px;color:#888;margin-top:10px;line-height:1.6;}
-.foot{font-size:12px;color:#666;margin-top:18px;display:flex;justify-content:space-between;align-items:baseline;gap:16px;}
+.tz-legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px;}
+.tz-item{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#555;}
+.tz-swatch{width:12px;height:12px;border-radius:2px;flex-shrink:0;}
+.foot{font-size:12px;color:#666;margin-top:18px;display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;}
 .foot-brand{font-weight:700;color:#B6842D;white-space:nowrap;font-size:13px;}
 </style>
 </head>
 <body>
 <div class="brand">Vegas Insider · World Cup 2026 · United States</div>
-<div class="title">US host cities: estimated productivity cost and working-day disruption</div>
-<div class="sub">All 11 official venues. San Francisco leads on cost per worker. New York leads on total cost due to workforce size.</div>
+<div class="title">US cities: estimated productivity cost and working-day disruption</div>
+<div class="sub">61 US cities ranked by timezone. Toggle between metrics and filter by city type or timezone.</div>
+
 <div class="tabs">
   <div class="tab active" onclick="show('perworker')">Est. cost per worker</div>
   <div class="tab" onclick="show('total')">Est. total cost</div>
   <div class="tab" onclick="show('hours')">Working-day hours</div>
 </div>
-<div style="position:relative;width:100%;height:620px">
-  <canvas id="c" role="img" aria-label="US host city World Cup disruption and productivity cost data"></canvas>
+
+<div class="filter-row">
+  <button class="filter-btn active" onclick="filter('all')">All 61 cities</button>
+  <button class="filter-btn" onclick="filter('host')">Host cities only</button>
+  <button class="filter-btn" onclick="filter('pacific')">Pacific (89h)</button>
+  <button class="filter-btn" onclick="filter('mountain')">Mountain (77h)</button>
+  <button class="filter-btn" onclick="filter('central')">Central (67.5h)</button>
+  <button class="filter-btn" onclick="filter('eastern')">Eastern (57.5h)</button>
 </div>
-<p class="note" id="n1">Estimated productivity cost per employed worker. Formula: 25% disruption rate × working-day match hours × mean hourly wage. Disruption rate: UKG World Cup Survey 2026. Wages: BLS OEWS 2025 metro data.</p>
-<p class="note" id="n2" style="display:none">Total estimated productivity cost per city. Formula: employed metro workforce × 25% disruption rate × working-day match hours × mean hourly wage. Workforce: BLS CES. Wages: BLS OEWS 2025. Note: New York's large workforce produces a high total despite lower per-worker exposure than Pacific cities.</p>
-<p class="note" id="n3" style="display:none">Hours of World Cup match time falling inside the standard working day (9am–5pm Mon–Fri) across all 104 fixtures. Pacific cities: 89h. Central cities: 67.5h. Eastern cities: 57.5h.</p>
+
+<div class="tz-legend">
+  <div class="tz-item"><div class="tz-swatch" style="background:#1A3A5C"></div>Pacific — 89h</div>
+  <div class="tz-item"><div class="tz-swatch" style="background:#2E6B9E"></div>Mountain — 77h</div>
+  <div class="tz-item"><div class="tz-swatch" style="background:#4a8fbf"></div>Central — 67.5h</div>
+  <div class="tz-item"><div class="tz-swatch" style="background:#7ab0d4"></div>Eastern — 57.5h</div>
+  <div class="tz-item"><div class="tz-swatch" style="background:#B6842D"></div>Alaska/Hawaii</div>
+  <div class="tz-item">🏟 = host city</div>
+</div>
+
+<div style="position:relative;width:100%;height:800px">
+  <canvas id="c" role="img" aria-label="US city World Cup disruption and productivity cost data"></canvas>
+</div>
+<p class="note" id="n1">Estimated productivity cost per employed worker. Formula: 25% disruption rate × working-day match hours × mean hourly wage (BLS OEWS 2024/2025). Disruption rate sourced from UKG World Cup Survey 2026.</p>
+<p class="note" id="n2" style="display:none">Total estimated productivity cost. Formula: metro workforce × 25% disruption rate × working-day match hours × mean hourly wage. Workforce: BLS CES. Cities with larger workforces produce higher totals regardless of per-worker exposure.</p>
+<p class="note" id="n3" style="display:none">Hours of World Cup match time inside the standard working day (9am–5pm Mon–Fri) across all 104 fixtures. Determined entirely by timezone: Pacific 89h · Mountain 77h · Central 67.5h · Eastern 57.5h.</p>
+
 <div class="foot">
-  <span>Vegas Insider 2026 · BLS OEWS 2025 · BLS CES · UKG World Cup Survey 2026 · FIFA 2026 schedule</span>
+  <span>Vegas Insider 2026 · BLS OEWS 2024/2025 · BLS CES · UKG World Cup Survey 2026 · FIFA 2026 schedule</span>
   <span class="foot-brand">VEGAS INSIDER</span>
 </div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-const D=[
-  {l:"🇺🇸 San Francisco, CA  Pacific",  h:89.0, pw:791,  total:1741, c:"#24324A"},
-  {l:"🇺🇸 Seattle, WA  Pacific",        h:89.0, pw:722,  total:1228, c:"#24324A"},
-  {l:"🇺🇸 Los Angeles, CA  Pacific",    h:89.0, pw:572,  total:2575, c:"#24324A"},
-  {l:"🇺🇸 Dallas, TX  Central",         h:67.5, pw:404,  total:1534, c:"#4a6080"},
-  {l:"🇺🇸 Kansas City, MO  Central",    h:67.5, pw:401,  total:442,  c:"#4a6080"},
-  {l:"🇺🇸 Houston, TX  Central",        h:67.5, pw:393,  total:1338, c:"#4a6080"},
-  {l:"🇺🇸 Boston, MA  Eastern",         h:57.5, pw:447,  total:893,  c:"#7a90a8"},
-  {l:"🇺🇸 New York City, NY  Eastern",  h:57.5, pw:418,  total:4095, c:"#7a90a8"},
-  {l:"🇺🇸 Philadelphia, PA  Eastern",   h:57.5, pw:358,  total:715,  c:"#7a90a8"},
-  {l:"🇺🇸 Atlanta, GA  Eastern",        h:57.5, pw:344,  total:997,  c:"#7a90a8"},
-  {l:"🇺🇸 Miami, FL  Eastern",          h:57.5, pw:331,  total:927,  c:"#7a90a8"},
+const TZ_COLORS = {
+  'Hawaii':   '#B6842D',
+  'Alaska':   '#B6842D',
+  'Pacific':  '#1A3A5C',
+  'Mountain': '#2E6B9E',
+  'Central':  '#4a8fbf',
+  'Eastern':  '#7ab0d4',
+};
+
+const D = [
+  // Hawaii
+  {l:"Honolulu, HI",        tz:"Hawaii",   host:false, h:109.5, pw:746,  total:328},
+  // Alaska
+  {l:"Anchorage, AK",       tz:"Alaska",   host:false, h:95.5,  pw:704,  total:113},
+  // Pacific
+  {l:"🏟 San Francisco, CA", tz:"Pacific",  host:true,  h:89.0,  pw:791,  total:1741},
+  {l:"🏟 Seattle, WA",       tz:"Pacific",  host:true,  h:89.0,  pw:722,  total:1228},
+  {l:"🏟 Los Angeles, CA",   tz:"Pacific",  host:true,  h:89.0,  pw:572,  total:2575},
+  {l:"San Jose, CA",         tz:"Pacific",  host:false, h:89.0,  pw:882,  total:970},
+  {l:"Bakersfield, CA",      tz:"Pacific",  host:false, h:89.0,  pw:679,  total:258},
+  {l:"Salinas, CA",          tz:"Pacific",  host:false, h:89.0,  pw:684,  total:109},
+  {l:"Portland, OR",         tz:"Pacific",  host:false, h:89.0,  pw:632,  total:821},
+  {l:"Sacramento, CA",       tz:"Pacific",  host:false, h:89.0,  pw:630,  total:693},
+  {l:"San Diego, CA",        tz:"Pacific",  host:false, h:89.0,  pw:605,  total:968},
+  {l:"Oxnard, CA",           tz:"Pacific",  host:false, h:89.0,  pw:603,  total:271},
+  {l:"Pomona, CA",           tz:"Pacific",  host:false, h:89.0,  pw:572,  total:200},
+  {l:"Riverside, CA",        tz:"Pacific",  host:false, h:89.0,  pw:537,  total:751},
+  {l:"Fresno, CA",           tz:"Pacific",  host:false, h:89.0,  pw:495,  total:188},
+  {l:"Las Vegas, NV",        tz:"Pacific",  host:false, h:89.0,  pw:490,  total:538},
+  // Mountain
+  {l:"Denver, CO",           tz:"Mountain", host:false, h:77.0,  pw:566,  total:848},
+  {l:"Salt Lake City, UT",   tz:"Mountain", host:false, h:77.0,  pw:476,  total:357},
+  {l:"Phoenix, AZ",          tz:"Mountain", host:false, h:77.0,  pw:461,  total:1060},
+  {l:"Albuquerque, NM",      tz:"Mountain", host:false, h:77.0,  pw:448,  total:188},
+  {l:"Tucson, AZ",           tz:"Mountain", host:false, h:77.0,  pw:431,  total:194},
+  // Central
+  {l:"Minneapolis, MN",      tz:"Central",  host:false, h:67.5,  pw:468,  total:935},
+  {l:"Austin, TX",           tz:"Central",  host:false, h:67.5,  pw:427,  total:512},
+  {l:"Chicago, IL",          tz:"Central",  host:false, h:67.5,  pw:418,  total:2010},
+  {l:"🏟 Dallas, TX",        tz:"Central",  host:true,  h:67.5,  pw:404,  total:1534},
+  {l:"Milwaukee, WI",        tz:"Central",  host:false, h:67.5,  pw:403,  total:323},
+  {l:"🏟 Kansas City, MO",   tz:"Central",  host:true,  h:67.5,  pw:401,  total:442},
+  {l:"Nashville, TN",        tz:"Central",  host:false, h:67.5,  pw:396,  total:436},
+  {l:"🏟 Houston, TX",       tz:"Central",  host:true,  h:67.5,  pw:393,  total:1338},
+  {l:"St. Louis, MO",        tz:"Central",  host:false, h:67.5,  pw:392,  total:548},
+  {l:"Oklahoma City, OK",    tz:"Central",  host:false, h:67.5,  pw:384,  total:250},
+  {l:"San Antonio, TX",      tz:"Central",  host:false, h:67.5,  pw:377,  total:453},
+  {l:"New Orleans, LA",      tz:"Central",  host:false, h:67.5,  pw:375,  total:207},
+  {l:"Memphis, TN",          tz:"Central",  host:false, h:67.5,  pw:359,  total:222},
+  {l:"El Paso, TX",          tz:"Central",  host:false, h:67.5,  pw:331,  total:122},
+  {l:"Laredo, TX",           tz:"Central",  host:false, h:67.5,  pw:312,  total:37},
+  {l:"McAllen, TX",          tz:"Central",  host:false, h:67.5,  pw:304,  total:106},
+  {l:"Brownsville, TX",      tz:"Central",  host:false, h:67.5,  pw:295,  total:53},
+  // Eastern
+  {l:"🏟 Boston, MA",        tz:"Eastern",  host:true,  h:57.5,  pw:447,  total:893},
+  {l:"🏟 New York City, NY", tz:"Eastern",  host:true,  h:57.5,  pw:418,  total:4095},
+  {l:"Hartford, CT",         tz:"Eastern",  host:false, h:57.5,  pw:410,  total:246},
+  {l:"Baltimore, MD",        tz:"Eastern",  host:false, h:57.5,  pw:396,  total:555},
+  {l:"🏟 Philadelphia, PA",  tz:"Eastern",  host:true,  h:57.5,  pw:358,  total:715},
+  {l:"Detroit, MI",          tz:"Eastern",  host:false, h:57.5,  pw:351,  total:701},
+  {l:"Richmond, VA",         tz:"Eastern",  host:false, h:57.5,  pw:346,  total:235},
+  {l:"🏟 Atlanta, GA",       tz:"Eastern",  host:true,  h:57.5,  pw:344,  total:997},
+  {l:"Raleigh, NC",          tz:"Eastern",  host:false, h:57.5,  pw:343,  total:291},
+  {l:"Columbus, OH",         tz:"Eastern",  host:false, h:57.5,  pw:342,  total:376},
+  {l:"Cleveland, OH",        tz:"Eastern",  host:false, h:57.5,  pw:339,  total:339},
+  {l:"Charlotte, NC",        tz:"Eastern",  host:false, h:57.5,  pw:338,  total:439},
+  {l:"Virginia Beach, VA",   tz:"Eastern",  host:false, h:57.5,  pw:335,  total:261},
+  {l:"Cincinnati, OH",       tz:"Eastern",  host:false, h:57.5,  pw:335,  total:369},
+  {l:"Indianapolis, IN",     tz:"Eastern",  host:false, h:57.5,  pw:333,  total:367},
+  {l:"Pittsburgh, PA",       tz:"Eastern",  host:false, h:57.5,  pw:333,  total:367},
+  {l:"Hialeah, FL",          tz:"Eastern",  host:false, h:57.5,  pw:331,  total:93},
+  {l:"🏟 Miami, FL",         tz:"Eastern",  host:true,  h:57.5,  pw:331,  total:927},
+  {l:"Tampa, FL",            tz:"Eastern",  host:false, h:57.5,  pw:328,  total:492},
+  {l:"Buffalo, NY",          tz:"Eastern",  host:false, h:57.5,  pw:327,  total:180},
+  {l:"Jacksonville, FL",     tz:"Eastern",  host:false, h:57.5,  pw:323,  total:243},
+  {l:"Orlando, FL",          tz:"Eastern",  host:false, h:57.5,  pw:321,  total:450},
+  {l:"Louisville, KY",       tz:"Eastern",  host:false, h:57.5,  pw:320,  total:208},
 ];
-let mode='perworker', ch=null;
+
+let mode='perworker', filt='all', ch=null;
+
 const plugin={id:'il',afterDraw(chart){
   const ctx=chart.ctx; ctx.save();
-  ctx.font='bold 12px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
+  ctx.font='bold 11px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
   ctx.fillStyle='#fff'; ctx.textAlign='right'; ctx.textBaseline='middle';
   chart.data.datasets[0].data.forEach((v,i)=>{
     const bar=chart.getDatasetMeta(0).data[i]; if(!bar) return;
     const bw=bar.x-chart.scales.x.getPixelForValue(0);
     if(bw>55){
       let label=mode==='hours'?v+'h':mode==='perworker'?'$'+v:(v>=1000?'$'+(v/1000).toFixed(1)+'B':'$'+v+'M');
-      ctx.fillText(label,bar.x-9,bar.y);
+      ctx.fillText(label,bar.x-8,bar.y);
     }
   });
   ctx.restore();
 }};
-function getConfig(){
-  if(mode==='perworker') return{data:D.map(d=>d.pw),max:900,tick:v=>'$'+v,tip:c=>' $'+c.parsed.x+' per worker'};
-  if(mode==='total') return{data:D.map(d=>d.total),max:4500,tick:v=>v>=1000?'$'+(v/1000).toFixed(1)+'B':'$'+v+'M',tip:c=>{const v=c.parsed.x;return' '+(v>=1000?'$'+(v/1000).toFixed(2)+'B':'$'+v+'M');}};
-  return{data:D.map(d=>d.h),max:95,tick:v=>v+'h',tip:c=>' '+c.parsed.x+'h working-day'};
+
+function getVisible(){
+  if(filt==='host') return D.filter(d=>d.host);
+  if(filt==='pacific') return D.filter(d=>d.tz==='Pacific');
+  if(filt==='mountain') return D.filter(d=>d.tz==='Mountain');
+  if(filt==='central') return D.filter(d=>d.tz==='Central');
+  if(filt==='eastern') return D.filter(d=>d.tz==='Eastern');
+  return D;
 }
+
+function getConfig(data){
+  if(mode==='perworker') return{vals:data.map(d=>d.pw),max:950,tick:v=>'$'+v,tip:c=>' $'+c.parsed.x+' per worker'};
+  if(mode==='total') return{vals:data.map(d=>d.total),max:4500,tick:v=>v>=1000?'$'+(v/1000).toFixed(1)+'B':'$'+v+'M',tip:c=>{const v=c.parsed.x;return' '+(v>=1000?'$'+(v/1000).toFixed(2)+'B':'$'+v+'M');}};
+  return{vals:data.map(d=>d.h),max:115,tick:v=>v+'h',tip:c=>' '+c.parsed.x+'h working-day'};
+}
+
 function render(){
-  const{data,max,tick,tip}=getConfig();
+  const visible=getVisible();
+  const sorted=[...visible].sort((a,b)=>{
+    if(mode==='perworker') return b.pw-a.pw;
+    if(mode==='total') return b.total-a.total;
+    return b.h-a.h;
+  });
+  const{vals,max,tick,tip}=getConfig(sorted);
+  const h=Math.max(400,sorted.length*32+40);
+  document.querySelector('#c').parentElement.style.height=h+'px';
   if(ch){ch.destroy();ch=null;}
   ch=new Chart(document.getElementById('c'),{
     type:'bar',
-    data:{labels:D.map(d=>d.l),datasets:[{data,backgroundColor:D.map(d=>d.c),borderRadius:3,borderSkipped:false}]},
+    data:{
+      labels:sorted.map(d=>d.l),
+      datasets:[{data:vals,backgroundColor:sorted.map(d=>TZ_COLORS[d.tz]),borderRadius:3,borderSkipped:false}]
+    },
     options:{
       indexAxis:'y',responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{callbacks:{label:tip}}},
       scales:{
-        x:{max,grid:{color:'rgba(0,0,0,0.06)'},border:{display:false},ticks:{font:{size:12},color:'#555',callback:tick}},
-        y:{grid:{display:false},border:{display:false},ticks:{font:{size:13,weight:'600'},color:'#111'}}
+        x:{max,grid:{color:'rgba(0,0,0,0.06)'},border:{display:false},ticks:{font:{size:11},color:'#555',callback:tick}},
+        y:{grid:{display:false},border:{display:false},ticks:{font:{size:11,weight:'600'},color:'#111'}}
       },
-      animation:{duration:400}
+      animation:{duration:300}
     },
     plugins:[plugin]
   });
 }
+
 function show(m){
   mode=m;
   document.querySelectorAll('.tab').forEach((t,i)=>{t.classList.toggle('active',['perworker','total','hours'][i]===m);});
@@ -99,6 +218,15 @@ function show(m){
   document.getElementById('n3').style.display=m==='hours'?'':'none';
   render();
 }
+
+function filter(f){
+  filt=f;
+  document.querySelectorAll('.filter-btn').forEach((b,i)=>{
+    b.classList.toggle('active',['all','host','pacific','mountain','central','eastern'][i]===f);
+  });
+  render();
+}
+
 render();
 </script>
 </body>
